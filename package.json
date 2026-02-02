@@ -1,0 +1,21 @@
+{
+  "name": "tab-sync-extension",
+  "version": "1.0.0",
+  "description": "Browser extension to sync tabs and tab groups across browsers",
+  "scripts": {
+    "dev": "npm run dev:extension & npm run dev:backend",
+    "dev:extension": "cd extension && webpack --mode development --watch",
+    "dev:backend": "cd backend && nodemon src/server.ts",
+    "build:extension": "cd extension && webpack --mode production",
+    "build:backend": "cd backend && tsc",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "workspaces": [
+    "extension",
+    "backend"
+  ],
+  "keywords": ["browser-extension", "tabs", "sync", "tab-groups"],
+  "author": "",
+  "license": "MIT"
+}

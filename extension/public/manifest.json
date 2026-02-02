@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Sync",
+  "version": "1.0.0",
+  "description": "Sync tabs and tab groups across multiple browsers",
+  "permissions": [
+    "tabs",
+    "tabGroups",
+    "storage",
+    "identity"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Tab Sync"
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
