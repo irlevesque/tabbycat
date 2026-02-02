@@ -1,10 +1,10 @@
 # AGENTS.md
 
-This document provides comprehensive information for agents working on Tab Sync Extension project, including project overview, architecture, code conventions, and development workflow.
+This document provides comprehensive information for agents working on Tabbycat, including project overview, architecture, code conventions, and development workflow.
 
 ## Project Overview
 
-Tab Sync Extension is a browser extension that synchronizes open tabs and tab groups across multiple browsers and operating systems using a non-circular sync system. It enables users to seamlessly access their browsing sessions from different devices and browsers without creating tab explosion.
+Tabbycat is a browser extension that synchronizes open tabs and tab groups across multiple browsers and operating systems using a non-circular sync system. It enables users to seamlessly access their browsing sessions from different devices and browsers without creating tab explosion.
 
 ### Key Features
 - **Non-circular tab sync** - Device-specific tracking prevents infinite loops
@@ -86,7 +86,7 @@ The extension prevents circular sync loops through browser-specific mechanisms:
 ### Directory Structure
 
 ```
-tab-sync-extension/
+tabbycat/
 ├── backend/                    # Backend API server
 │   ├── src/
 │   │   ├── middleware/         # Express middleware
@@ -151,7 +151,7 @@ tab-sync-extension/
 ### General
 - **No comments** in code (unless specifically requested)
 - **Concise naming**: Use descriptive but brief names
-- **File naming**: 
+- **File naming**:
   - Components: PascalCase (e.g., `index.tsx`)
   - Utilities: camelCase (e.g., `authHelper.ts`)
   - Styles: kebab-case matching component (e.g., `popup.css`)

@@ -1,6 +1,6 @@
 # Testing Guide
 
-This document provides a comprehensive testing strategy and roadmap for the Tab Sync Extension project.
+This document provides a comprehensive testing strategy and roadmap for the Tabbycat project.
 
 ## TODO
 

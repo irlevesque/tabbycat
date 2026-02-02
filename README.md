@@ -1,4 +1,4 @@
-# Tab Sync Extension
+# Tabbycat
 
 A browser extension that synchronizes open tabs and tab groups across multiple browsers and operating systems without creating circular sync loops.
 
@@ -67,7 +67,7 @@ From the popup, users can:
 ## Project Structure
 
 ```
-tab-sync-extension/
+tabbycat/
 ├── extension/          # Browser extension code
 │   ├── src/
 │   │   ├── popup/     # Extension popup UI
@@ -96,7 +96,7 @@ tab-sync-extension/
 ### 1. Clone and Install
 
 ```bash
-cd tab-sync-extension
+cd tabbycat
 npm install
 cd extension && npm install
 cd ../backend && npm install

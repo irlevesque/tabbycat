@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Get Tab Sync Extension up and running in 5 minutes.
+Get Tabbycat up and running in 5 minutes.
 
 ## Prerequisites Check
 
@@ -13,7 +13,7 @@ Before starting, make sure you have:
 ### 1. Run Setup Script
 
 ```bash
-cd tab-sync-extension
+cd tabbycat
 ./setup.sh
 ```
 
@@ -44,7 +44,7 @@ mongod
 
 In a new terminal:
 ```bash
-cd tab-sync-extension/backend
+cd tabbycat/backend
 npm run dev
 ```
 
@@ -54,7 +54,7 @@ You should see: `Server running on port 3000`
 
 In another terminal:
 ```bash
-cd tab-sync-extension/extension
+cd tabbycat/extension
 npm run build
 ```
 
@@ -64,13 +64,13 @@ npm run build
 1. Open `chrome://extensions/`
 2. Enable "Developer mode" (top right)
 3. Click "Load unpacked"
-4. Navigate to `tab-sync-extension/extension/dist`
+4. Navigate to `tabbycat/extension/dist`
 5. Click "Select Folder"
 
 #### Firefox:
 1. Open `about:debugging#/runtime/this-firefox`
 2. Click "Load Temporary Add-on..."
-3. Navigate to `tab-sync-extension/extension/dist/manifest.json`
+3. Navigate to `tabbycat/extension/dist/manifest.json`
 4. Click "Open"
 
 ### 7. Authenticate

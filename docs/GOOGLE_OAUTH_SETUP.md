@@ -1,6 +1,6 @@
 # Setting up Google OAuth
 
-This guide will help you set up Google OAuth credentials for the Tab Sync Extension.
+This guide will help you set up Google OAuth credentials for the Tabbycat.
 
 ## Steps
 
@@ -9,7 +9,7 @@ This guide will help you set up Google OAuth credentials for the Tab Sync Extens
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Click "Select a project" at the top
 3. Click "New Project"
-4. Enter a project name (e.g., "Tab Sync Extension")
+4. Enter a project name (e.g., "Tabbycat")
 5. Click "Create"
 
 ### 2. Enable Google+ API
@@ -24,7 +24,7 @@ This guide will help you set up Google OAuth credentials for the Tab Sync Extens
 2. Click "Create Credentials" > "OAuth client ID"
 3. If prompted, configure the OAuth consent screen:
    - Choose "External"
-   - Enter app name: "Tab Sync Extension"
+   - Enter app name: "Tabbycat"
    - User support email: your email
    - Developer contact: your email
    - Click "Save and Continue"
@@ -33,7 +33,7 @@ This guide will help you set up Google OAuth credentials for the Tab Sync Extens
 
 4. Configure the OAuth client:
    - Application type: Web application
-   - Name: "Tab Sync Extension"
+   - Name: "Tabbycat"
    - Authorized redirect URIs: `http://localhost:3000/auth/callback/google`
    - Click "Create"
 
