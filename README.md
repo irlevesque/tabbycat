@@ -87,13 +87,40 @@ tabbycat/
 
 ## Setup Instructions
 
-### Prerequisites
+### Option 1: Docker (Recommended)
+
+The easiest way to get started is using Docker and Docker Compose. See [docs/DOCKER.md](docs/DOCKER.md) for detailed instructions.
+
+**Quick Start:**
+
+```bash
+# Create .env file with Google OAuth credentials
+cat > .env << EOF
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:3000/auth/callback/google
+EOF
+
+# Start services
+docker compose up -d
+
+# Build extension
+docker compose --profile build up --build extension-build
+
+# View logs
+docker compose logs -f
+```
+
+### Option 2: Manual Setup
+
+#### Prerequisites
 
 - Node.js 18+
 - MongoDB
 - Google Cloud Console project with OAuth credentials
+- Docker and Docker Compose (optional, for containerized deployment)
 
-### 1. Clone and Install
+#### 1. Clone and Install
 
 ```bash
 cd tabbycat
@@ -222,6 +249,18 @@ npm run dev
 
 ## Development
 
+### Using Docker
+
+```bash
+# Start backend with hot reload
+docker compose up backend
+
+# Build extension
+docker compose --profile build up --build extension-build
+```
+
+### Without Docker
+
 Run everything:
 
 ```bash
@@ -230,12 +269,33 @@ npm run dev
 
 ## Production Deployment
 
-### Backend
-1. Set environment variables
+### Using Docker
+
+```bash
+# Update credentials in docker-compose.yml
+# Update GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env
+
+# Start all services
+docker compose up -d
+
+# Build extension
+docker compose --profile build up --build extension-build
+```
+
+See [docs/DOCKER.md](docs/DOCKER.md) for production deployment details including:
+- Security checklist
+- Backup and restore procedures
+- Scaling and resource limits
+- Zero-downtime deployments
+
+### Without Docker
+
+#### Backend
+1. Set environment variables in `backend/.env`
 2. Build TypeScript: `cd backend && npm run build`
 3. Start server: `node dist/server.js`
 
-### Extension
+#### Extension
 1. Build: `cd extension && npm run build`
 2. Package `extension/dist` folder
 3. Submit to Chrome Web Store and Firefox Add-ons

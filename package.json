@@ -1,5 +1,5 @@
 {
-  "name": "tab-sync-extension",
+  "name": "tabbycat-extension",
   "version": "1.0.0",
   "description": "Browser extension to sync tabs and tab groups across browsers",
   "scripts": {

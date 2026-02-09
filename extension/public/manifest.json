@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Tab Sync",
+  "name": "Tabbycat",
   "version": "1.0.0",
   "description": "Sync tabs and tab groups across multiple browsers",
   "permissions": [
@@ -13,20 +13,16 @@
     "http://localhost:3000/*"
   ],
   "background": {
-    "service_worker": "background.js",
-    "type": "module"
+    "scripts": ["background.js"]
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Tab Sync"
+    "default_title": "Tabbycat"
   },
   "options_page": "options.html",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
-  },
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }

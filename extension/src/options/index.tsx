@@ -29,7 +29,7 @@ const Options: React.FC = () => {
       'notifyOnSync',
       'deviceName'
     ]);
-    
+
     setSettings({
       syncInterval: result.syncInterval || 30,
       autoSync: result.autoSync !== undefined ? result.autoSync : true,
@@ -78,7 +78,7 @@ const Options: React.FC = () => {
     <div className="options">
       <div className="container">
         <header>
-          <h1>Tab Sync Settings</h1>
+          <h1>Tabbycat Settings</h1>
           <p>Configure how your tabs sync across devices</p>
         </header>
 
@@ -99,7 +99,7 @@ const Options: React.FC = () => {
 
         <div className="settings-section">
           <h2>Sync Settings</h2>
-          
+
           <div className="setting">
             <label htmlFor="autoSync">
               <input
@@ -152,7 +152,7 @@ const Options: React.FC = () => {
         </div>
 
         <footer>
-          <p>Tab Sync Extension v1.0.0</p>
+          <p>Tabbycat Extension v1.0.0</p>
         </footer>
       </div>
     </div>

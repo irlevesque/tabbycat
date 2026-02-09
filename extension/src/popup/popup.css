@@ -143,6 +143,103 @@ body {
   margin-bottom: 12px;
 }
 
+.settings-section {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.settings-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.setting {
+  margin-bottom: 16px;
+}
+
+.setting label {
+  display: block;
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.setting input[type="text"],
+.setting input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.setting input[type="text"]:focus,
+.setting input[type="number"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.setting input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.setting small {
+  display: block;
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.current-device {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.current-device h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.device.current {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.device-stats {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tab-count {
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.sync-status {
+  font-size: 13px;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .empty {
   color: #9ca3af;
   text-align: center;

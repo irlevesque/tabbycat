@@ -1,5 +1,5 @@
 {
-  "name": "tab-sync-extension-core",
+  "name": "tabbycat-extension-core",
   "version": "1.0.0",
   "description": "Browser extension to sync tabs and tab groups across browsers",
   "main": "dist/background.js",

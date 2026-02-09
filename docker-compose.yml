@@ -1,0 +1,61 @@
+services:
+  tabbycat-mongodb:
+    image: mongo:7
+    container_name: tabbycat-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      # TODO: use MONGODB_USER and MONGODB_PASS env vars
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - tabbycat-network
+
+  tabbycat-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tabbycat-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # TODO: use the same MONGODB_USER and MONGODB_PASS vars as above
+      MONGODB_URI: mongodb://admin:password@tabbycat-mongodb:27017/tabbycat?authSource=admin
+      JWT_SECRET: your-jwt-secret-change-this-in-production
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL:-http://localhost:3000/auth/callback/google}
+    depends_on:
+      - tabbycat-mongodb
+    networks:
+      - tabbycat-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  extension-build:
+    build:
+      context: ./extension
+      dockerfile: Dockerfile
+    container_name: tabbycat-extension-build
+    volumes:
+      - ./extension/dist:/output
+    command:
+      - /bin/sh
+      - -c
+      - "cp -a /extension/dist/* /output && echo 'Extension artifacts copied to ./extension/dist'"
+    profiles:
+      - build
+
+networks:
+  tabbycat-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

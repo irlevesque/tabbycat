@@ -24,7 +24,7 @@ app.use('/api/sync', syncRoutes);
 app.use('/api/devices', deviceRoutes);
 
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Tab Sync API Server' });
+  res.json({ message: 'Tabbycat API Server' });
 });
 
 app.listen(PORT, () => {
