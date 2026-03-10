@@ -249,6 +249,26 @@ npm run dev
 
 ## Development
 
+### Running Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Backend tests only
+cd backend && pnpm test
+
+# Extension tests only
+cd extension && pnpm test
+
+# Generate coverage report
+pnpm test -- --coverage
+```
+
+**Test Coverage Targets:**
+- Backend: 80%
+- Extension: 70%
+
 ### Using Docker
 
 ```bash

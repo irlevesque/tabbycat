@@ -8,25 +8,33 @@ import deviceRoutes from './routes/devices';
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/tabsync';
 
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+export const connectDB = async () => {
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(MONGODB_URI)
+      .then(() => console.log('Connected to MongoDB'))
+      .catch((err) => console.error('MongoDB connection error:', err));
+  }
+};
 
 app.use('/auth', authRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/devices', deviceRoutes);
 
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Tabbycat API Server' });
+app.get('/health', (req: Request, res: Response) => {
+  res.json({ status: 'ok' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+export default app;

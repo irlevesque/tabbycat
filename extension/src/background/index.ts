@@ -1,5 +1,7 @@
-// @ts-nocheck - Suppressing TypeScript errors for this file
 import { Tab, TabGroup, SyncData, SyncedDeviceMetadata, SyncedTabInfo, DeviceSettings } from '../types';
+
+// Type declarations for Chrome APIs
+declare const chrome: any;
 
 const SYNC_INTERVAL = 30000;
 const SYNC_GROUP_EMOJI = '📡';

@@ -176,8 +176,28 @@ No changes required - using existing Device, Tab, TabGroup models.
 
 ## Testing Checklist
 
+### Unit Tests
 - [x] Build completes without errors
 - [x] Types correctly defined
+- [x] Backend test infrastructure configured
+- [x] Extension test infrastructure configured
+- [x] Jest configuration for backend
+- [x] Jest configuration for extension
+- [x] MongoDB memory server setup
+- [x] Chrome API mocks implemented
+- [x] Test utilities created
+
+### Test Coverage
+- [x] User model tests (5/5 passing)
+- [x] Tab model tests (4/4 passing)
+- [ ] Device model tests (in progress)
+- [ ] TabGroup model tests (in progress)
+- [ ] Route tests (in progress)
+- [ ] Middleware tests (in progress)
+- [ ] Popup component tests (configured)
+- [ ] Options component tests (configured)
+
+### Manual Testing
 - [x] Chrome tab groups created with emoji
 - [x] Firefox metadata tracking works
 - [x] Device toggle sync works
@@ -207,6 +227,31 @@ No changes required - using existing Device, Tab, TabGroup models.
 
 ## Files Modified
 
+### Testing Infrastructure (New Files)
+
+#### Backend Tests
+- `backend/jest.config.js`: Jest configuration
+- `backend/tests/setup.ts`: MongoDB memory server, test utilities
+- `backend/tests/routes/auth.test.ts`: OAuth flow tests
+- `backend/tests/routes/sync.test.ts`: Sync endpoint tests
+- `backend/tests/routes/devices.test.ts`: Device management tests
+- `backend/tests/middleware/auth.test.ts`: JWT middleware tests
+- `backend/tests/models/User.test.ts`: User model tests ✅ PASSING
+- `backend/tests/models/Device.test.ts`: Device model tests
+- `backend/tests/models/Tab.test.ts`: Tab model tests ✅ PASSING
+- `backend/tests/models/TabGroup.test.ts`: TabGroup model tests
+- `backend/src/server.ts`: Modified to skip listening in test mode
+
+#### Extension Tests
+- `extension/jest.config.js`: Jest configuration
+- `extension/tests/setup.ts`: Chrome API mocks
+- `extension/tests/popup.test.tsx`: Popup component tests
+- `extension/tests/options.test.tsx`: Options page tests
+
+#### CI/CD
+- `.github/workflows/test.yml`: GitHub Actions workflow
+
+### Other Files
 - `shared/types/index.ts`: Added new type definitions
 - `extension/src/types/index.ts`: Added new type definitions
 - `extension/src/background/index.ts`: Complete rewrite with non-circular sync

@@ -48,6 +48,25 @@ Tabbycat is a browser extension that synchronizes open tabs and tab groups acros
 - **nodemon** for backend development
 - **CopyWebpackPlugin** and **HtmlWebpackPlugin** for asset management
 
+### Testing
+- **Jest** for unit and integration testing
+- **ts-jest** for TypeScript support
+- **mongodb-memory-server** for in-memory MongoDB testing
+- **supertest** for API testing
+- **@testing-library/react** for React component testing
+- **@testing-library/jest-dom** for DOM assertions
+- **JSDOM** for browser environment simulation
+- **pnpm** for package management
+
+### Test Coverage Goals
+- Backend: 80% code coverage
+- Extension: 70% code coverage
+
+### Testing Strategy
+- **Backend**: Unit tests for models, integration tests for routes and middleware
+- **Extension**: Component tests for React UI, mocked Chrome API for browser-specific code
+- **CI/CD**: Automated testing via GitHub Actions on every push and PR
+
 ## Architecture
 
 ### High-Level Architecture
@@ -832,6 +851,43 @@ export interface DeviceSettings {
 8. Test error scenarios (API down, network issues)
 9. Test non-circular sync (sync, move tab, sync again)
 10. Test device management (toggle, color, limit, cleanup)
+
+### Test Files
+
+#### Backend Tests (`backend/tests/`)
+- **setup.ts**: MongoDB memory server, test utilities, token creation
+- **routes/auth.test.ts**: OAuth flow, token management, verify endpoints
+- **routes/sync.test.ts**: Tab sync endpoint, device tabs retrieval
+- **routes/devices.test.ts**: Device registration, device listing
+- **middleware/auth.test.ts**: JWT validation, protected routes
+- **models/User.test.ts**: User model validation, indexes
+- **models/Device.test.ts**: Device model validation, indexes
+- **models/Tab.test.ts**: Tab model validation, composite indexes
+- **models/TabGroup.test.ts**: TabGroup model validation, indexes
+
+#### Extension Tests (`extension/tests/`)
+- **setup.ts**: Chrome API mocks, JSDOM environment setup
+- **popup.test.tsx**: Popup component UI tests, device management
+- **options.test.tsx**: Settings page tests, configuration updates
+
+### Running Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Backend tests only
+cd backend && pnpm test
+
+# Extension tests only
+cd extension && pnpm test
+
+# Generate coverage report
+pnpm test -- --coverage
+
+# Watch mode
+pnpm test -- --watch
+```
 
 ## Documentation Maintenance
 
