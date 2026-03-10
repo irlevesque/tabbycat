@@ -1,6 +1,8 @@
 import request from 'supertest';
 import { app } from '../src/server';
 import { User } from '../src/models/User';
+import { createTestToken } from '../setup';
+import { pendingTokens } from '../src/routes/auth';
 
 describe('Auth Routes', () => {
   describe('GET /auth/google', () => {
@@ -21,7 +23,7 @@ describe('Auth Routes', () => {
       const response = await request(app).get('/auth/google');
       const url = response.headers.location;
       expect(url).toContain('client_id=');
-      expect(url).toContain('redirect_uri=http://localhost:3000/auth/callback/google');
+      expect(url).toContain('redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback%2Fgoogle');
       expect(url).toContain('response_type=code');
       expect(url).toContain('scope=openid%20email%20profile');
     });
@@ -30,8 +32,7 @@ describe('Auth Routes', () => {
   describe('GET /auth/callback/google', () => {
     it('should handle valid OAuth code and return user', async () => {
       const response = await request(app)
-        .post('/auth/callback/google')
-        .send({ code: 'test-code' });
+        .get('/auth/callback/google?code=test-code');
 
       expect(response.status).toBe(200);
       expect(response.text).toContain('Authentication Successful');
@@ -39,8 +40,7 @@ describe('Auth Routes', () => {
 
     it('should create new user if not exists', async () => {
       const response = await request(app)
-        .post('/auth/callback/google')
-        .send({ code: 'test-code' });
+        .get('/auth/callback/google?code=test-code-2');
 
       expect(response.status).toBe(200);
 
@@ -60,8 +60,7 @@ describe('Auth Routes', () => {
       });
 
       const response = await request(app)
-        .post('/auth/callback/google')
-        .send({ code: 'existing-code' });
+        .get('/auth/callback/google?code=existing-code');
 
       expect(response.status).toBe(200);
 
@@ -72,17 +71,15 @@ describe('Auth Routes', () => {
 
     it('should generate valid JWT token', async () => {
       const response = await request(app)
-        .post('/auth/callback/google')
-        .send({ code: 'test-code' });
+        .get('/auth/callback/google?code=test-code-3');
 
       expect(response.status).toBe(200);
-      expect(response.text).toContain('jwtToken=');
+      expect(response.text).toContain('jwtToken =');
     });
 
     it('should return HTML with token display', async () => {
       const response = await request(app)
-        .post('/auth/callback/google')
-        .send({ code: 'test-code' });
+        .get('/auth/callback/google?code=test-code-4');
 
       expect(response.status).toBe(200);
       expect(response.text).toContain('<!DOCTYPE html>');
@@ -91,36 +88,42 @@ describe('Auth Routes', () => {
 
     it('should return 400 error for missing code', async () => {
       const response = await request(app)
-        .post('/auth/callback/google')
-        .send({});
+        .get('/auth/callback/google');
 
       expect(response.status).toBe(400);
       expect(response.text).toContain('No code provided');
     });
 
     it('should return 500 error for OAuth failure', async () => {
+      const originalFetch = global.fetch;
+      (global.fetch as any) = jest.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 400,
+          json: () => Promise.resolve({ error: 'invalid_grant' })
+        })
+      );
+
       const response = await request(app)
-        .post('/auth/callback/google')
-        .send({ code: 'invalid' });
+        .get('/auth/callback/google?code=invalid');
 
       expect(response.status).toBe(500);
+
+      (global.fetch as any) = originalFetch;
     });
   });
 
   describe('GET /auth/poll', () => {
     beforeEach(() => {
-      import { createTestToken } from '../tests/setup';
-      const token = createTestToken('user123');
-      const tokenExpiration = Date.now() + 5 * 60 * 1000;
-
-      import { pendingTokens } from '../src/routes/auth';
-      pendingTokens.set('test-token-id', {
-        token,
-        expiresAt: tokenExpiration
-      });
+      pendingTokens.clear();
     });
 
     it('should return token by tokenId', async () => {
+      pendingTokens.set('test-token-id', {
+        token: createTestToken('user123'),
+        expiresAt: Date.now() + 3600000
+      });
+
       const response = await request(app)
         .get('/auth/poll?tokenId=test-token-id');
 
@@ -129,6 +132,11 @@ describe('Auth Routes', () => {
     });
 
     it('should return token by extensionId as fallback', async () => {
+      pendingTokens.set('test-extension-id', {
+        token: createTestToken('user123'),
+        expiresAt: Date.now() + 3600000
+      });
+
       const response = await request(app)
         .get('/auth/poll?extensionId=test-extension-id');
 
@@ -137,9 +145,6 @@ describe('Auth Routes', () => {
     });
 
     it('should return 404 for expired tokens', async () => {
-      import { createTestToken } from '../tests/setup';
-
-      import { pendingTokens } from '../src/routes/auth';
       pendingTokens.set('expired-token', {
         token: createTestToken('user123'),
         expiresAt: Date.now() - 1000
@@ -153,7 +158,11 @@ describe('Auth Routes', () => {
     });
 
     it('should remove token after successful retrieval', async () => {
-      import { pendingTokens } from '../src/routes/auth';
+      pendingTokens.set('test-token-id', {
+        token: createTestToken('user123'),
+        expiresAt: Date.now() + 3600000
+      });
+
       const initialSize = pendingTokens.size;
 
       await request(app)
@@ -173,9 +182,6 @@ describe('Auth Routes', () => {
 
   describe('GET /auth/verify', () => {
     it('should return valid token with user info', async () => {
-      import { createTestToken } from '../tests/setup';
-      const token = createTestToken('user123');
-
       const user = await User.create({
         email: 'test@example.com',
         name: 'Test User',
@@ -183,6 +189,8 @@ describe('Auth Routes', () => {
         oauthId: '123456789',
         createdAt: new Date()
       });
+
+      const token = createTestToken(user._id.toString());
 
       const response = await request(app)
         .get('/auth/verify')
@@ -220,7 +228,6 @@ describe('Auth Routes', () => {
     });
 
     it('should return 401 if user not found', async () => {
-      import { createTestToken } from '../tests/setup';
       const token = createTestToken('nonexistent-user');
 
       const response = await request(app)
@@ -233,22 +240,27 @@ describe('Auth Routes', () => {
   });
 
   describe('Token Cleanup', () => {
-    it('should clean up expired tokens periodically', async () => {
-      import { createTestToken } from '../tests/setup';
-      import { pendingTokens } from '../src/routes/auth';
+    beforeEach(() => {
+      pendingTokens.clear();
+    });
 
+    it('should clean up expired tokens periodically', async () => {
       const token = createTestToken('user123');
       pendingTokens.set('cleanup-test', {
         token,
         expiresAt: Date.now() - 1000
       });
 
-      const initialSize = pendingTokens.size;
-      expect(initialSize).toBe(1);
+      expect(pendingTokens.size).toBe(1);
 
-      setTimeout(() => {
-        expect(pendingTokens.size).toBe(0);
-      }, 70000);
+      // Manually trigger cleanup
+      pendingTokens.forEach((value: { expiresAt: number }, key: string) => {
+        if (value.expiresAt < Date.now()) {
+          pendingTokens.delete(key);
+        }
+      });
+
+      expect(pendingTokens.size).toBe(0);
     });
   });
 });

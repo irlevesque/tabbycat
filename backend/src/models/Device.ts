@@ -18,7 +18,7 @@ const deviceSchema = new Schema<IDevice>({
   os: { type: String, required: true },
   lastSync: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now }
-});
+}, { validateBeforeSave: true, strict: true });
 
 deviceSchema.index({ userId: 1, deviceId: 1 }, { unique: true });
 

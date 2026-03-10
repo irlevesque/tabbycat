@@ -1,7 +1,9 @@
 import request from 'supertest';
+import mongoose from 'mongoose';
 import { app } from '../src/server';
 import { User } from '../src/models/User';
 import { Device } from '../src/models/Device';
+import { createTestToken } from '../setup';
 import { Tab } from '../src/models/Tab';
 import { TabGroup } from '../src/models/TabGroup';
 
@@ -35,7 +37,7 @@ describe('Sync Routes', () => {
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [{
             id: 'tab123',
             url: 'https://example.com',
@@ -44,7 +46,7 @@ describe('Sync Routes', () => {
             active: false,
             windowId: 'window123',
             index: 0,
-            groupId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439014'),
+            groupId: 'group123',
             pinned: false,
             lastAccessed: Date.now()
           }],
@@ -67,7 +69,7 @@ describe('Sync Routes', () => {
     it('should delete existing tabs for device', async () => {
       await Tab.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         tabId: 'existing-tab123',
         url: 'https://existing.com',
         title: 'Existing',
@@ -80,7 +82,7 @@ describe('Sync Routes', () => {
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [{
             id: 'new-tab123',
             url: 'https://new.com',
@@ -94,7 +96,7 @@ describe('Sync Routes', () => {
 
       expect(response.status).toBe(200);
 
-      const tabs = await Tab.find({ userId, deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012') });
+      const tabs = await Tab.find({ userId, deviceId: 'device123' });
       expect(tabs).toHaveLength(1);
       expect(tabs[0].tabId).toBe('new-tab123');
     });
@@ -102,7 +104,7 @@ describe('Sync Routes', () => {
     it('should delete existing tab groups for device', async () => {
       await TabGroup.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         groupId: 'existing-group123',
         title: 'Existing Group',
         color: 'red',
@@ -116,7 +118,7 @@ describe('Sync Routes', () => {
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [{
             id: 'tab123',
             url: 'https://example.com',
@@ -138,7 +140,7 @@ describe('Sync Routes', () => {
 
       expect(response.status).toBe(200);
 
-      const groups = await TabGroup.find({ userId, deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012') });
+      const groups = await TabGroup.find({ userId, deviceId: 'device123' });
       expect(groups).toHaveLength(1);
       expect(groups[0].groupId).toBe('new-group123');
     });
@@ -146,7 +148,7 @@ describe('Sync Routes', () => {
     it('should update device lastSync timestamp', async () => {
       const device = await Device.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         name: 'Test Device',
         browser: 'chrome',
         os: 'Windows',
@@ -158,7 +160,7 @@ describe('Sync Routes', () => {
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [{
             id: 'tab123',
             url: 'https://example.com',
@@ -177,7 +179,7 @@ describe('Sync Routes', () => {
     it('should return other devices\' tabs', async () => {
       await Device.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         name: 'Current Device',
         browser: 'chrome',
         os: 'Windows',
@@ -199,7 +201,7 @@ describe('Sync Routes', () => {
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [{
             id: 'tab123',
             url: 'https://example.com',
@@ -221,7 +223,7 @@ describe('Sync Routes', () => {
       const response = await request(app)
         .post('/api/sync')
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [],
           timestamp: Date.now()
         });
@@ -246,7 +248,7 @@ describe('Sync Routes', () => {
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [],
           timestamp: Date.now()
         });
@@ -259,7 +261,7 @@ describe('Sync Routes', () => {
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [],
           timestamp: Date.now()
         });
@@ -268,47 +270,51 @@ describe('Sync Routes', () => {
     });
 
     it('should limit returned tabs to 10 per device', async () => {
+      // Create another device with many tabs
       await Device.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
-        name: 'Device with many tabs',
+        deviceId: 'other-device',
+        name: 'Other Device',
         browser: 'chrome',
         os: 'Windows',
         lastSync: new Date(),
         createdAt: new Date()
       });
 
-      const tabs = Array.from({ length: 20 }, (_, i) => ({
-        id: `tab-${i}`,
-        url: `https://example${i}.com`,
-        title: `Example ${i}`,
+      const otherTabs = Array.from({ length: 15 }, (_, i) => ({
+        id: `other-tab-${i}`,
+        url: `https://other${i}.com`,
+        title: `Other ${i}`,
         windowId: 'window123',
         index: i,
         lastAccessed: Date.now() - i * 1000
       }));
 
-      await Tab.create({
-        userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
-        tabId: tabs.map(t => t.id),
-        url: tabs.map(t => t.url),
-        title: tabs.map(t => t.title),
-        windowId: 'window123',
-        index: tabs.map(t => t.index),
-        lastAccessed: new Date()
-      });
+      for (const tab of otherTabs) {
+        await Tab.create({
+          userId,
+          deviceId: 'other-device',
+          tabId: tab.id,
+          url: tab.url,
+          title: tab.title,
+          windowId: 'window123',
+          index: tab.index,
+          lastAccessed: tab.lastAccessed
+        });
+      }
 
       const response = await request(app)
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
-          tabs,
+          deviceId: 'device123',
+          tabs: [],
           timestamp: Date.now()
         });
 
       expect(response.status).toBe(200);
-      const deviceTabs = response.body.deviceTabs['device123'];
+      const deviceTabs = response.body.deviceTabs['other-device'];
+      expect(deviceTabs).toBeDefined();
       expect(deviceTabs.tabs.length).toBeLessThanOrEqual(10);
     });
 
@@ -319,7 +325,7 @@ describe('Sync Routes', () => {
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [],
           timestamp: Date.now()
         });
@@ -339,7 +345,7 @@ describe('Sync Routes', () => {
         active: true,
         windowId: 'window123',
         index: 0,
-        groupId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439014'),
+        groupId: 'group123',
         pinned: true,
         lastAccessed: Date.now()
       };
@@ -348,14 +354,14 @@ describe('Sync Routes', () => {
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [tabData],
           timestamp: Date.now()
         });
 
       expect(response.status).toBe(200);
 
-      const savedTab = await Tab.findOne({ userId, deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'), tabId: tabData.id });
+      const savedTab = await Tab.findOne({ userId, deviceId: 'device123', tabId: tabData.id });
       expect(savedTab).toBeDefined();
       expect(savedTab?.url).toBe(tabData.url);
       expect(savedTab?.title).toBe(tabData.title);
@@ -377,7 +383,7 @@ describe('Sync Routes', () => {
         .post('/api/sync')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           tabs: [],
           tabGroups: [groupData],
           timestamp: Date.now()
@@ -385,7 +391,7 @@ describe('Sync Routes', () => {
 
       expect(response.status).toBe(200);
 
-      const savedGroup = await TabGroup.findOne({ userId, deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'), groupId: groupData.id });
+      const savedGroup = await TabGroup.findOne({ userId, deviceId: 'device123', groupId: groupData.id });
       expect(savedGroup).toBeDefined();
       expect(savedGroup?.title).toBe(groupData.title);
       expect(savedGroup?.color).toBe(groupData.color);

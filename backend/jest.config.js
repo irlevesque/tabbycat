@@ -22,6 +22,7 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  setupFiles: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
     '^\\.\\./src/(.*)$': '<rootDir>/src/$1'
   }

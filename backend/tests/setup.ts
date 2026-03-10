@@ -7,8 +7,25 @@ import { connectDB } from '../src/server';
 
 dotenv.config();
 
+export const JWT_SECRET = 'test-secret-key-for-testing-only';
 export let mongoServer: MongoMemoryServer;
-export const JWT_SECRET = process.env.JWT_SECRET || 'test-secret-key-for-testing-only';
+
+process.env.JWT_SECRET = JWT_SECRET;
+process.env.GOOGLE_CLIENT_ID = 'test-client-id';
+process.env.GOOGLE_CLIENT_SECRET = 'test-client-secret';
+
+// Mock fetch for OAuth tests
+(global as any).fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve({
+      id: '123456789',
+      email: 'test@example.com',
+      name: 'Test User'
+    })
+  })
+);
 
 jest.setTimeout(30000);
 

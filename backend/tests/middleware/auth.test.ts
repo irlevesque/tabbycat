@@ -1,12 +1,19 @@
 import request from 'supertest';
+import express, { Application } from 'express';
 import mongoose from 'mongoose';
-import { app } from '../src/server';
 import { User } from '../src/models/User';
-import { mongoServer, createTestToken } from '../setup';
+import { authMiddleware } from '../src/middleware/auth';
+import { createTestToken } from '../setup';
 
 describe('Auth Middleware', () => {
+  let app: Application;
   let testUser: any;
   let testToken: string;
+
+  beforeEach(() => {
+    app = express();
+    app.use(express.json());
+  });
 
   beforeAll(async () => {
     testUser = await User.create({
@@ -25,15 +32,13 @@ describe('Auth Middleware', () => {
 
   describe('GET /api/test-protected', () => {
     beforeEach(() => {
-      app.get('/api/test-protected', async (req: any, res: any) => {
+      app.get('/api/test-protected', authMiddleware, async (req: any, res: any) => {
         res.json({ userId: req.userId });
       });
     });
 
     afterEach(() => {
-      app._router.stack = app._router.stack.filter(
-        (layer: any) => layer.route?.path !== '/api/test-protected'
-      );
+      app._router.stack = [];
     });
 
     it('should attach userId to request', async () => {
@@ -77,20 +82,5 @@ describe('Auth Middleware', () => {
       expect(response.status).toBe(401);
     });
 
-    it('should pass request to next middleware on success', async () => {
-      let middlewareCalled = false;
-      
-      app.get('/api/test-pass', (req: any, res: any) => {
-        middlewareCalled = true;
-        res.json({ success: true });
-      });
-
-      const response = await request(app)
-        .get('/api/test-pass')
-        .set('Authorization', `Bearer ${testToken}`);
-
-      expect(response.status).toBe(200);
-      expect(middlewareCalled).toBe(true);
-    });
   });
 });

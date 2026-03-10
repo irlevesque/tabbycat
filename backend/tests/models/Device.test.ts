@@ -21,8 +21,8 @@ describe('Device Model', () => {
     await device.save();
 
     expect(device._id).toBeDefined();
-    expect(device.userId).toBe('user123');
-    expect(device.deviceId).toBe('device123');
+    expect(device.userId.toString()).toBe('507f1f77bcf86cd799439011');
+    expect(device.deviceId.toString()).toBe('507f1f77bcf86cd799439012');
     expect(device.name).toBe('Test Device');
     expect(device.browser).toBe('chrome');
     expect(device.os).toBe('Windows');

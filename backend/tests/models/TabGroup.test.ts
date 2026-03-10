@@ -23,9 +23,9 @@ describe('TabGroup Model', () => {
     await tabGroup.save();
 
     expect(tabGroup._id).toBeDefined();
-    expect(tabGroup.userId).toBe('user123');
-    expect(tabGroup.deviceId).toBe('device123');
-    expect(tabGroup.groupId).toBe('group123');
+    expect(tabGroup.userId.toString()).toBe('507f1f77bcf86cd799439011');
+    expect(tabGroup.deviceId.toString()).toBe('507f1f77bcf86cd799439012');
+    expect(tabGroup.groupId.toString()).toBe('507f1f77bcf86cd799439014');
     expect(tabGroup.title).toBe('Work');
     expect(tabGroup.color).toBe('blue');
     expect(tabGroup.collapsed).toBe(false);

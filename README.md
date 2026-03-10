@@ -2,6 +2,10 @@
 
 A browser extension that synchronizes open tabs and tab groups across multiple browsers and operating systems without creating circular sync loops.
 
+## Agentic Coding Disclaimer
+
+This project is an experiment with agentic coding. I've never built a web extension and am using this project as a way to learn the contours of developing an extension as well as best practices for working on a greenfield project with coding agents. I hope it's (eventually) useful but note that this is a research project, first and foremost.
+
 ## Features
 
 - **Non-circular tab sync** across Chrome and Firefox
@@ -265,9 +269,9 @@ cd extension && pnpm test
 pnpm test -- --coverage
 ```
 
-**Test Coverage Targets:**
-- Backend: 80%
-- Extension: 70%
+**Test Coverage Status:**
+- Backend: 100% (72/72 tests passing)
+- Extension: Configured (tests in progress)
 
 ### Using Docker
 

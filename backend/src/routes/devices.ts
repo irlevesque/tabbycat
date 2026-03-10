@@ -11,14 +11,20 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const devices = await Device.find({ userId: req.userId }).sort({ lastSync: -1 });
+    let devices;
+    try {
+      devices = await Device.find({ userId: req.userId });
+    } catch (err) {
+      console.error('Find error:', err);
+      throw err;
+    }
+    devices.sort((a, b) => b.lastSync.getTime() - a.lastSync.getTime());
     
     const deviceList = [];
 
     for (const device of devices) {
-      const tabs = await Tab.find({ userId: req.userId, deviceId: device.deviceId })
-        .sort({ lastAccessed: -1 })
-        .limit(100);
+      const tabs = await Tab.find({ userId: req.userId, deviceId: device.deviceId }).limit(100);
+      tabs.sort((a, b) => Number(b.lastAccessed) - Number(a.lastAccessed));
 
       deviceList.push({
         deviceId: device.deviceId,
@@ -52,21 +58,34 @@ router.post('/register', authMiddleware, async (req: AuthRequest, res: Response)
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const device = await Device.findOneAndUpdate(
-      { userId: req.userId, deviceId },
-      { 
-        name, 
-        browser, 
-        os, 
-        lastSync: new Date() 
-      },
-      { upsert: true, new: true }
-    );
+    let device = await Device.findOne({ userId: req.userId, deviceId });
+    
+    if (device) {
+      device.name = name;
+      device.browser = browser;
+      device.os = os;
+      device.lastSync = new Date();
+      await device.save();
+    } else {
+      device = await Device.create({
+        userId: req.userId,
+        deviceId,
+        name,
+        browser,
+        os,
+        lastSync: new Date()
+      });
+    }
 
     res.json({ success: true, device });
-  } catch (error) {
-    console.error('Device registration error:', error);
-    res.status(500).json({ error: 'Failed to register device' });
+  } catch (error: any) {
+    if (error.name === 'ValidationError' || error.name === 'MongooseError') {
+      console.error('Device validation error:', error.message);
+      res.status(400).json({ error: 'Validation failed', details: error.message });
+    } else {
+      console.error('Device registration error:', error);
+      res.status(500).json({ error: 'Failed to register device' });
+    }
   }
 });
 

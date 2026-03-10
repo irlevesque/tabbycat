@@ -190,10 +190,14 @@ No changes required - using existing Device, Tab, TabGroup models.
 ### Test Coverage
 - [x] User model tests (5/5 passing)
 - [x] Tab model tests (4/4 passing)
-- [ ] Device model tests (in progress)
-- [ ] TabGroup model tests (in progress)
-- [ ] Route tests (in progress)
-- [ ] Middleware tests (in progress)
+- [x] Device model tests (5/5 passing)
+- [x] TabGroup model tests (3/3 passing)
+- [x] Route tests (49/49 passing)
+  - Auth routes: 19/19 passing
+  - Sync routes: 13/13 passing
+  - Devices routes: 17/17 passing
+- [x] Middleware tests (6/6 passing)
+- [x] Total: 72/72 backend tests passing (100%)
 - [ ] Popup component tests (configured)
 - [ ] Options component tests (configured)
 
@@ -231,15 +235,16 @@ No changes required - using existing Device, Tab, TabGroup models.
 
 #### Backend Tests
 - `backend/jest.config.js`: Jest configuration
+- `backend/jest.setup.js`: Environment setup before module loading
 - `backend/tests/setup.ts`: MongoDB memory server, test utilities
-- `backend/tests/routes/auth.test.ts`: OAuth flow tests
-- `backend/tests/routes/sync.test.ts`: Sync endpoint tests
-- `backend/tests/routes/devices.test.ts`: Device management tests
-- `backend/tests/middleware/auth.test.ts`: JWT middleware tests
+- `backend/tests/routes/auth.test.ts`: OAuth flow tests ✅ PASSING
+- `backend/tests/routes/sync.test.ts`: Sync endpoint tests ✅ PASSING
+- `backend/tests/routes/devices.test.ts`: Device management tests ✅ PASSING
+- `backend/tests/middleware/auth.test.ts`: JWT middleware tests ✅ PASSING
 - `backend/tests/models/User.test.ts`: User model tests ✅ PASSING
-- `backend/tests/models/Device.test.ts`: Device model tests
+- `backend/tests/models/Device.test.ts`: Device model tests ✅ PASSING
 - `backend/tests/models/Tab.test.ts`: Tab model tests ✅ PASSING
-- `backend/tests/models/TabGroup.test.ts`: TabGroup model tests
+- `backend/tests/models/TabGroup.test.ts`: TabGroup model tests ✅ PASSING
 - `backend/src/server.ts`: Modified to skip listening in test mode
 
 #### Extension Tests

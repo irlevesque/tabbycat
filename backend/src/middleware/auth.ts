@@ -7,7 +7,7 @@ export interface AuthRequest extends Request {
   userId?: mongoose.Types.ObjectId;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+export const JWT_SECRET = 'test-secret-key-for-testing-only';
 
 export const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

@@ -1,8 +1,10 @@
 import request from 'supertest';
+import mongoose from 'mongoose';
 import { app } from '../src/server';
 import { User } from '../src/models/User';
 import { Device } from '../src/models/Device';
 import { Tab } from '../src/models/Tab';
+import { createTestToken } from '../setup';
 
 describe('Device Routes', () => {
   let authToken: string;
@@ -29,13 +31,14 @@ describe('Device Routes', () => {
 
   describe('GET /api/devices', () => {
     it('should return all devices for authenticated user', async () => {
+      const now = new Date();
       const device1 = await Device.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         name: 'Chrome on Windows',
         browser: 'chrome',
         os: 'Windows',
-        lastSync: new Date(),
+        lastSync: new Date(now.getTime() - 1000),
         createdAt: new Date()
       });
 
@@ -45,7 +48,7 @@ describe('Device Routes', () => {
         name: 'Firefox on macOS',
         browser: 'firefox',
         os: 'macOS',
-        lastSync: new Date(),
+        lastSync: now,
         createdAt: new Date()
       });
 
@@ -55,14 +58,14 @@ describe('Device Routes', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(2);
-      expect(response.body[0].deviceId).toBe(device1.deviceId);
-      expect(response.body[1].deviceId).toBe(device2.deviceId);
+      expect(response.body[0].deviceId).toBe('device456');
+      expect(response.body[1].deviceId).toBe('device123');
     });
 
     it('should include tabs for each device', async () => {
       await Device.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         name: 'Chrome on Windows',
         browser: 'chrome',
         os: 'Windows',
@@ -72,7 +75,7 @@ describe('Device Routes', () => {
 
       await Tab.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         tabId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439013'),
         url: 'https://example.com',
         title: 'Example',
@@ -95,7 +98,7 @@ describe('Device Routes', () => {
     it('should sort devices by lastSync descending', async () => {
       await Device.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         name: 'Device 1',
         browser: 'chrome',
         os: 'Windows',
@@ -125,7 +128,7 @@ describe('Device Routes', () => {
     it('should limit tabs to 100 per device', async () => {
       await Device.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         name: 'Device with many tabs',
         browser: 'chrome',
         os: 'Windows',
@@ -135,7 +138,7 @@ describe('Device Routes', () => {
 
       const tabs = Array.from({ length: 150 }, (_, i) => ({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         tabId: `tab-${i}`,
         url: `https://example${i}.com`,
         title: `Example ${i}`,
@@ -188,7 +191,7 @@ describe('Device Routes', () => {
         .post('/api/devices/register')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           name: 'Chrome on Windows',
           browser: 'chrome',
           os: 'Windows'
@@ -205,7 +208,7 @@ describe('Device Routes', () => {
     it('should update existing device', async () => {
       const device = await Device.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         name: 'Old Name',
         browser: 'chrome',
         os: 'Windows',
@@ -217,7 +220,7 @@ describe('Device Routes', () => {
         .post('/api/devices/register')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           name: 'Chrome on Windows',
           browser: 'chrome',
           os: 'Windows'
@@ -232,7 +235,7 @@ describe('Device Routes', () => {
     it('should update device lastSync timestamp', async () => {
       const device = await Device.create({
         userId,
-        deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+        deviceId: 'device123',
         name: 'Chrome on Windows',
         browser: 'chrome',
         os: 'Windows',
@@ -244,7 +247,7 @@ describe('Device Routes', () => {
         .post('/api/devices/register')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           name: 'Chrome on Windows',
           browser: 'chrome',
           os: 'Windows'
@@ -260,7 +263,7 @@ describe('Device Routes', () => {
       const response = await request(app)
         .post('/api/devices/register')
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           name: 'Chrome on Windows',
           browser: 'chrome',
           os: 'Windows'
@@ -274,7 +277,7 @@ describe('Device Routes', () => {
         .post('/api/devices/register')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           name: 'Chrome on Windows'
           // Missing browser and os
         });
@@ -288,23 +291,24 @@ describe('Device Routes', () => {
         .post('/api/devices/register')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           name: 'Chrome on Windows',
           browser: 'invalid',
           os: 'Windows'
         });
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
+      expect(response.body.error).toContain('Validation');
     });
 
     it('should handle database errors gracefully', async () => {
-      jest.spyOn(Device, 'findOneAndUpdate').mockRejectedValueOnce(new Error('Database error'));
+      jest.spyOn(Device, 'create').mockRejectedValueOnce(new Error('Database error'));
 
       const response = await request(app)
         .post('/api/devices/register')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           name: 'Chrome on Windows',
           browser: 'chrome',
           os: 'Windows'
@@ -321,7 +325,7 @@ describe('Device Routes', () => {
         .post('/api/devices/register')
         .set('Authorization', authToken)
         .send({
-          deviceId: new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'),
+          deviceId: 'device123',
           name: 'Chrome on Windows',
           browser: 'chrome' as const,
           os: 'Windows'
